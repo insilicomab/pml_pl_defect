@@ -74,7 +74,7 @@ def main(args):
     # restore model in wandb
     best_model = wandb.restore(f'{args.model_name}.ckpt', run_path=args.wandb_run_path)
 
-    # load state_dict from ckpt with 'model.' deleted
+    # load state_dict from ckpt with 'model.' and 'loss_fn.W' key deleted
     state_dict = torch.load(best_model.name, map_location=torch.device(device))['state_dict']
     del state_dict['loss_fn.W']
     new_state_dict = { k.replace('model.', '') : v for k, v in state_dict.items() }
