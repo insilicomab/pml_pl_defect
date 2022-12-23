@@ -8,7 +8,6 @@ Usage:
         --image_size {image size default: 224}
         --embedding_size {embedder output size default: 512} \
         --k {top@k default: 10}
-        
 """
 import pandas as pd
 import argparse
