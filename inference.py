@@ -76,9 +76,9 @@ def main(args):
 
     # load state_dict from ckpt with 'model.' and 'loss_fn.W' key deleted
     state_dict = torch.load(best_model.name, map_location=torch.device(device))['state_dict']
-    del state_dict['loss_fn.W']
-    new_state_dict = { k.replace('model.', '') : v for k, v in state_dict.items() }
-    model.load_state_dict(new_state_dict, strict=True)
+    state_dict = {k: v for k, v in state_dict.items() if k != 'loss_fn.W'}
+    state_dict = { k.replace('model.', '') : v for k, v in state_dict.items() }
+    model.load_state_dict(state_dict, strict=True)
     model.to(device)
 
     # inference
