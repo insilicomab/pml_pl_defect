@@ -78,6 +78,7 @@ def main(args):
     state_dict = {k: v for k, v in state_dict.items() if k != 'loss_fn.W'}
     state_dict = {k.replace('model.', '') : v for k, v in state_dict.items()}
     model.load_state_dict(state_dict, strict=True)
+    model.eval()
     model.to(device)
 
     # inference
