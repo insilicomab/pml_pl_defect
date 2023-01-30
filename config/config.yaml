@@ -99,7 +99,7 @@ callbacks:
     early_stopping:
         enable: True
         monitor: 'val_loss'
-        patience: 10
+        patience: 20
         mode: 'min'
     model_checkpoint:
         enable: True
