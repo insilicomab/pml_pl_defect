@@ -66,8 +66,8 @@ def main(args):
     # model
     model = get_model(
         model_name=args.timm_name,
-        pretrained=False,
         embedding_size=args.embedding_size,
+        pretrained=False,
     )
 
     # restore model in wandb

@@ -1,32 +1,33 @@
+import timm
 import torch
 import torch.nn as nn
-import timm
-import pytorch_metric_learning
-from pytorch_metric_learning.utils import common_functions
 
 
-class ConvnextBase(nn.Module):
-    def __init__(self, pretrained, embedding_size):
-        super(ConvnextBase, self).__init__()
-        self.pretrained = pretrained
+class TimmNet(nn.Module):
+    def __init__(self, model_name: str, embedding_size: int, pretrained: bool):
+        super(TimmNet, self).__init__()
+        self.model_name = model_name
         self.embedding_size = embedding_size
+        self.pretrained = pretrained
 
-        self.trunk = timm.create_model(
-            'convnext_base',
+        self.net = timm.create_model(
+            self.model_name,
+            num_classes=self.embedding_size,
             pretrained=self.pretrained,
         )
-        self.trunk.head.fc = common_functions.Identity()
-        self.embedder = nn.Linear(1024, self.embedding_size)
-    
+
     def forward(self, x):
-        x = self.trunk(x)
-        x = self.embedder(x)
-        return x
+        return self.net(x)
 
 
-def get_model(model_name, pretrained, embedding_size):
-    if model_name=='convnext_base':
-        return ConvnextBase(
-            pretrained=pretrained,
-            embedding_size=embedding_size,
-        )
+def get_model(
+    model_name: str, 
+    embedding_size: int, 
+    pretrained: bool
+    ):
+    model = TimmNet(
+        model_name=model_name,
+        embedding_size=embedding_size,
+        pretrained=pretrained,
+    )
+    return model

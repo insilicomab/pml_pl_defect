@@ -17,8 +17,8 @@ class Net(pl.LightningModule):
         # model
         self.model = get_model(
             model_name=self.cfg.model.model_name,
-            pretrained=self.cfg.model.pretrained,
             embedding_size=self.cfg.embedding_size,
+            pretrained=self.cfg.model.pretrained,
         )
         
         # loss function
