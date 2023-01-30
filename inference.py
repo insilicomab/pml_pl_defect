@@ -28,8 +28,8 @@ def main(args):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # read data
-    train = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/pml_defect/input/train.csv')
-    test = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/pml_defect/input/sample_submission.csv', header=None)
+    train = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/pml_pl_defect/input/train.csv')
+    test = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/pml_pl_defect/input/sample_submission.csv', header=None)
 
     # train image name list & label list
     image_name_list = train['id']
@@ -46,7 +46,7 @@ def main(args):
     dataset = DefectDataset(
         image_name_list,
         label_list,
-        img_dir='/content/drive/MyDrive/Colab Notebooks/pml_defect/input/train_data',
+        img_dir='/content/drive/MyDrive/Colab Notebooks/pml_pl_defect/input/train_data',
         transform=TestTransforms(image_size=args.image_size),
         phase='test'
     )
@@ -55,7 +55,7 @@ def main(args):
     test_dataset = DefectDataset(
         x_test,
         dummy,
-        img_dir='/content/drive/MyDrive/Colab Notebooks/defect/input/test_data',
+        img_dir='/content/drive/MyDrive/Colab Notebooks/pml_pl_defect/input/test_data',
         transform=TestTransforms(image_size=args.image_size),
         phase='test'
     )
