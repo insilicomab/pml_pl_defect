@@ -7,7 +7,7 @@ from tqdm import tqdm
 import torch
 
 
-def predict(inference_model, test_dataloader, index_to_target, k):
+def predict_fn(inference_model, test_dataloader, index_to_target, k):
     filenames, distances, preds, top1s, modes = [], [], [], [], []
     with torch.no_grad():
         for image, filename in tqdm(test_dataloader):
@@ -51,32 +51,16 @@ def predict(inference_model, test_dataloader, index_to_target, k):
     return df, df_top1, df_mode
 
 
-class ModelCheckpoint():
-    def __init__(self, save_model_path, filename):
-        self.best_score=np.inf
-        self.save_path_filename = os.path.join(save_model_path, f'{filename}.pth')
-    
-    def __call__(self, model, current_score):
-        if current_score < self.best_score:
-            self.best_score = current_score
-            torch.save(model.state_dict(), self.save_path_filename)
+def load_weights(model, weights):
+    # device
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    # load state_dict from ckpt with 'model.' and 'loss_fn.W' key deleted
+    state_dict = torch.load(weights.name, map_location=torch.device(device))['state_dict']
+    state_dict = {k: v for k, v in state_dict.items() if k != 'loss_fn.W'}
+    state_dict = {k.replace('model.', '') : v for k, v in state_dict.items()}
+    model.load_state_dict(state_dict, strict=True)
+    model.eval()
+    model.to(device)
 
-class EarlyStopping:
-    def __init__(self, patience=10, verbose=1):
-        self.epoch = 0
-        self.pre_loss = float('inf')
-        self.patience = patience
-        self.verbose = verbose
-        
-    def __call__(self, current_loss):
-        if self.pre_loss < current_loss:
-            self.epoch += 1
-            if self.epoch > self.patience:
-                if self.verbose:
-                    print('early stopping')
-                return True
-        else:
-            self.epoch = 0
-            self.pre_loss = current_loss
-        return False
+    return model
