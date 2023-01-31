@@ -20,13 +20,10 @@ import wandb
 
 from src.dataset import DefectDataset, TestTransforms
 from src.model import get_model
-from src.utils import predict
+from src.utils import load_weights, predict_fn
 
 
 def main(args):
-    # device
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
     # read data
     train = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/pml_pl_defect/input/train.csv')
     test = pd.read_csv('/content/drive/MyDrive/Colab Notebooks/pml_pl_defect/input/sample_submission.csv', header=None)
@@ -71,21 +68,19 @@ def main(args):
     )
 
     # restore model in wandb
-    best_model = wandb.restore(f'{args.model_name}.ckpt', run_path=args.wandb_run_path)
+    best_model_weights = wandb.restore(f'{args.model_name}.ckpt', run_path=args.wandb_run_path)
 
-    # load state_dict from ckpt with 'model.' and 'loss_fn.W' key deleted
-    state_dict = torch.load(best_model.name, map_location=torch.device(device))['state_dict']
-    state_dict = {k: v for k, v in state_dict.items() if k != 'loss_fn.W'}
-    state_dict = {k.replace('model.', '') : v for k, v in state_dict.items()}
-    model.load_state_dict(state_dict, strict=True)
-    model.eval()
-    model.to(device)
+    # load weights
+    model = load_weights(
+        model=model, 
+        weights=best_model_weights,
+    )
 
     # inference
     im = InferenceModel(model)
     im.train_knn(dataset)
 
-    df, df_top1, df_mode = predict(
+    df, df_top1, df_mode = predict_fn(
         inference_model=im,
         test_dataloader=test_dataloader,
         index_to_target=index2target,
