@@ -109,7 +109,7 @@ callbacks:
         save_last: False
 
 trainer:
-    max_epochs: 200
+    max_epochs: 2
     gpus: 1
     auto_lr_find: True
     deterministic: True
